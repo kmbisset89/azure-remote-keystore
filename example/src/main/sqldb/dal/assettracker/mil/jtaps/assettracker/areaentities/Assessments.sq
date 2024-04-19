@@ -1,0 +1,21 @@
+CREATE TABLE assessments (
+    id INTEGER PRIMARY KEY,
+    specific_assessment TEXT NOT NULL,
+    conducted_by TEXT NOT NULL,
+    comments TEXT,
+    date_conducted INTEGER,
+    attachment_ids TEXT NOT NULL,
+    description TEXT NOT NULL
+);
+
+storeAssessment:
+INSERT OR REPLACE INTO assessments VALUES (?, ?, ?, ?, ?, ?,?);
+
+getAllAssessments:
+SELECT * FROM assessments;
+
+getAssessmentById:
+SELECT * FROM assessments WHERE id = ?;
+
+deleteAssessment:
+DELETE FROM assessments WHERE id = ?;

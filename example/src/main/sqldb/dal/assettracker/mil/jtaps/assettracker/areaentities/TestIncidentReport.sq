@@ -1,0 +1,27 @@
+CREATE TABLE TestIncidentReports (
+   id INTEGER PRIMARY KEY NOT NULL,
+   name TEXT NOT NULL,
+   incident_date INTEGER NOT NULL,
+   tir_number TEXT NOT NULL,
+   priority INTEGER NOT NULL,
+   location_id_of_incident INTEGER NOT NULL,
+   field_representative TEXT NOT NULL,
+   failure_type INTEGER NOT NULL,
+   comments TEXT NOT NULL,
+   assessment_id INTEGER NOT NULL,
+   attachement_ids TEXT NOT NULL
+);
+
+getAllIncidentReports:
+SELECT * FROM TestIncidentReports;
+
+getIncidentReportById:
+SELECT * FROM TestIncidentReports WHERE id = ?;
+
+insertReport:
+INSERT OR REPLACE INTO TestIncidentReports VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+removeReport:
+DELETE FROM TestIncidentReports WHERE id = ?;
+
+

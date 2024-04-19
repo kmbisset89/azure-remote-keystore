@@ -1,0 +1,21 @@
+CREATE TABLE assemblies (
+    id INTEGER PRIMARY KEY,
+    vendor_id INTEGER NOT NULL,
+    specific_assembly TEXT NOT NULL,
+    assembly_state TEXT NOT NULL,
+    end_state_description TEXT,
+    attachment_ids TEXT NOT NULL
+);
+
+insertAssembly:
+INSERT OR REPLACE INTO assemblies VALUES (?, ?, ?, ?, ?, ?);
+
+selectAssembly:
+SELECT * FROM assemblies WHERE id = ?;
+
+getAllAssemblies:
+SELECT * FROM assemblies;
+
+deleteAssembly:
+DELETE FROM assemblies WHERE id = ?;
+

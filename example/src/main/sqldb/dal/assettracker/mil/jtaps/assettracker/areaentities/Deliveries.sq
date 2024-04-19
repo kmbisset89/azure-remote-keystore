@@ -1,0 +1,22 @@
+CREATE TABLE deliveries (
+    id INTEGER PRIMARY KEY,
+    expected_delivery_date INTEGER NOT NULL,
+    vendor_id INTEGER NOT NULL,
+    shipment_ids TEXT NOT NULL,
+    delivery_order TEXT NOT NULL,
+    cln TEXT NOT NULL,
+    name TEXT NOT NULL,
+    attachment_ids TEXT NOT NULL
+);
+
+insertDelivery:
+INSERT OR REPLACE INTO deliveries VALUES (?,?,?,?,?,?,?,?);
+
+selectAllDeliveries:
+SELECT * FROM deliveries;
+
+selectDeliveryById:
+SELECT * FROM deliveries WHERE id = ?;
+
+deleteDeliveryById:
+DELETE FROM deliveries WHERE id = ?;

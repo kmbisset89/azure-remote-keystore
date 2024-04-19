@@ -1,0 +1,24 @@
+CREATE TABLE components (
+    id INTEGER PRIMARY KEY,
+    serial_number TEXT NOT NULL,
+    component_Specifics TEXT NOT NULL,
+    status TEXT NOT NULL,
+    vendor_id INTEGER NOT NULL,
+    last_known_location_id INTEGER,
+    delivery_order TEXT,
+    component_type TEXT NOT NULL,
+    FOREIGN KEY (vendor_id) REFERENCES vendors(id),
+    FOREIGN KEY (last_known_location_id) REFERENCES locations(id)
+);
+
+insertComponent:
+INSERT OR REPLACE INTO components VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+
+getComponentById:
+SELECT * FROM components WHERE id = ?;
+
+getAllComponents:
+SELECT * FROM components;
+
+removeComponent:
+DELETE FROM components WHERE id = ?;

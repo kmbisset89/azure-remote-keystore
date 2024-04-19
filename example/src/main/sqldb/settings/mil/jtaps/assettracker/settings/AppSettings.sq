@@ -1,0 +1,15 @@
+import kotlin.Boolean;
+
+CREATE TABLE AppSettings (
+   isOfflineModeEnabled INTEGER AS Boolean NOT NULL DEFAULT 0,
+   isAutoUpdateEnabled INTEGER AS Boolean NOT NULL DEFAULT 0
+);
+
+updateOfflineModeSetting:
+UPDATE AppSettings SET isOfflineModeEnabled = :isOfflineModeEnabled;
+
+updateAutoUpdateSetting:
+UPDATE AppSettings SET isAutoUpdateEnabled = :isAutoUpdateEnabled;
+
+getAppSettings:
+SELECT * FROM AppSettings;

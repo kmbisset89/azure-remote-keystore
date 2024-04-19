@@ -1,0 +1,24 @@
+CREATE TABLE locations (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    address TEXT NOT NULL,
+    city TEXT NOT NULL,
+    state TEXT NOT NULL,
+    zip TEXT NOT NULL,
+    name TEXT NOT NULL
+);
+
+selectAll:
+SELECT *
+FROM locations;
+
+insertLocation:
+INSERT OR REPLACE INTO locations
+VALUES (?, ?, ?, ?, ?, ?);
+
+getById:
+SELECT * FROM locations WHERE id = :locationId;
+
+deleteLocationById:
+DELETE FROM locations WHERE id = :locationId;
+
+

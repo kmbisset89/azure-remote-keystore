@@ -1,0 +1,23 @@
+CREATE TABLE events (
+    id INTEGER PRIMARY KEY,
+    name TEXT NOT NULL,
+    start_date INTEGER NOT NULL,
+    end_date INTEGER NOT NULL,
+    location INTEGER NOT NULL,
+    attachementIds TEXT NOT NULL,
+    assessmentIds TEXT NOT NULL
+);
+
+insertEvent:
+INSERT OR REPLACE INTO events VALUES (?, ?, ?, ?, ?, ?, ?);
+
+selectAllEvents:
+SELECT * FROM events;
+
+selectEventById:
+SELECT * FROM events WHERE id = ?;
+
+deleteEventById:
+DELETE FROM events WHERE id = ?;
+
+

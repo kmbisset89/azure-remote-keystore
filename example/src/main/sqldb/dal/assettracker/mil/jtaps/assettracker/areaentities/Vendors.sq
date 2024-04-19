@@ -1,0 +1,17 @@
+CREATE TABLE vendors (
+    id INTEGER PRIMARY KEY NOT NULL,
+    name TEXT NOT NULL,
+    locationIds TEXT NOT NULL
+);
+
+getAllVendors:
+SELECT * FROM vendors;
+
+insertVendor:
+INSERT OR REPLACE INTO vendors VALUES (?, ?, ?);
+
+getVendorById:
+SELECT * FROM vendors WHERE id = ?;
+
+deleteVendor:
+DELETE FROM vendors WHERE id = ?;

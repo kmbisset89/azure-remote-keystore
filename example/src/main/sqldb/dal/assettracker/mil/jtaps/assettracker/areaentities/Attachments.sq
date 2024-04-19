@@ -1,0 +1,23 @@
+import kotlin.Boolean;
+
+CREATE TABLE attachments (
+    id INTEGER PRIMARY KEY,
+    filename TEXT NOT NULL,
+    type TEXT NOT NULL,
+    description TEXT,
+    upload_time INTEGER NOT NULL,
+    has_link INTEGER AS Boolean NOT NULL
+);
+
+storeAttachment:
+INSERT OR REPLACE INTO attachments VALUES (?, ?, ?, ?, ?, ?);
+
+getAllAttachments:
+SELECT * FROM attachments;
+
+getAttachmentById:
+SELECT * FROM attachments WHERE id = ?;
+
+deleteAttachment:
+DELETE FROM attachments WHERE id = ?;
+

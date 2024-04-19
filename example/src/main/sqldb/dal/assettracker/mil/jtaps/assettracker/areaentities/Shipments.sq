@@ -1,0 +1,29 @@
+CREATE TABLE shipments (
+    id INTEGER PRIMARY KEY,
+    date_of_shipment INTEGER NOT NULL,
+    shipment_name TEXT NOT NULL,
+    origin_id INTEGER NOT NULL,
+    destination_id INTEGER NOT NULL,
+    description TEXT NOT NULL,
+    shipment_status TEXT NOT NULL,
+    arrival_date INTEGER,
+    origin_poc_name TEXT NOT NULL,
+    destinationP_poc_name TEXT NOT NULL,
+    attachment_ids TEXT NOT NULL,
+    component_ids TEXT NOT NULL,
+    trackingNumber TEXT,
+    FOREIGN KEY (origin_id) REFERENCES locations (id),
+    FOREIGN KEY (destination_id) REFERENCES locations (id)
+);
+
+insertShipment:
+INSERT OR REPLACE INTO shipments VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+selectAllShipments:
+SELECT * FROM shipments;
+
+selectShipmentById:
+SELECT * FROM shipments WHERE id = ?;
+
+deleteShipment:
+DELETE FROM shipments WHERE id = ?;
