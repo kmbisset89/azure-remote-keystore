@@ -11,8 +11,11 @@ jobs:
     env:
       GRADLE_PUBLISH_KEY: ${{ secrets.GRADLE_PUBLISH_KEY }}
       GRADLE_PUBLISH_SECRET: ${{ secrets.GRADLE_PUBLISH_SECRET }}
+      CONNECTION_STRING: ${{ secrets.CONNECTION_STRING }}
+      CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
+      KEYSTORE_FILE_NAME: ${{ secrets.KEYSTORE_FILE_NAME }}
+      SUPPORT_FILE_NAME: ${{ secrets.SUPPORT_FILE_NAME }}
     if: ${{ !contains(github.event.head_commit.message, 'ci skip') }}
-
     steps:
       - uses: actions/setup-java@v4
         with:
