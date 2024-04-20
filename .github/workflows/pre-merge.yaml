@@ -28,5 +28,5 @@ jobs:
       - name: Cache Gradle Caches
         uses: gradle/gradle-build-action@v2
       - name: Run Gradle tasks
-        run: ./gradlew preMerge --continue -PconnectionString=${CONNECTION_STRING} -PcontainerName=${CONTAINER_NAME} -PkeyStoreFileName=${KEYSTORE_FILE_NAME} -PsupportDocumentFilename=${SUPPORT_FILE_NAME}
+        run: ./gradlew preMerge --continue -PconnectionString=$CONNECTION_STRING -PcontainerName=$CONTAINER_NAME -PkeyStoreFileName=$KEYSTORE_FILE_NAME -PsupportDocumentFilename=$SUPPORT_FILE_NAME
 
