@@ -28,5 +28,5 @@ gradleEnterprise {
 
 rootProject.name = "Azure Remote Keystore Plugin"
 
-//include(":example")
+include(":example")
 includeBuild("plugin-build")
