@@ -67,14 +67,17 @@ abstract class AzureRemoteKeyStore : Plugin<Project> {
             }
 
 
-            project.tasks.whenTaskAdded { a ->
-                if (a.name == "validateSigningRelease") {
-                    a.dependsOn(download)
-                }
-                if (a.name == "packageRelease") {
-                    a.finalizedBy(remove)
+            project.afterEvaluate {
+                project.tasks.whenTaskAdded { a ->
+                    if (a.name == "validateSigningRelease") {
+                        a.dependsOn(download)
+                    }
+                    if (a.name == "packageRelease") {
+                        a.finalizedBy(remove)
+                    }
                 }
             }
+
         }catch (e: Exception){
            project.logger.error("Error in AzureRemoteKeyStore plugin: ${e.message}")
             project.logger.error(e.stackTraceToString())
