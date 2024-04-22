@@ -22,57 +22,62 @@ abstract class AzureRemoteKeyStore : Plugin<Project> {
      */
     override fun apply(project: Project) {
 
-        val localProps = Properties().also {
-            if (project.rootProject.file("local.properties").exists()) {
-                it.load(project.rootProject.file("local.properties").inputStream())
+        try{
+            val localProps = Properties().also {
+                if (project.rootProject.file("local.properties").exists()) {
+                    it.load(project.rootProject.file("local.properties").inputStream())
+                }
             }
-        }
 
-        val pr = PropertyResolver(localProps, project.properties)
+            val pr = PropertyResolver(localProps, project.properties)
 
-        RetrieveKeyStoreInformationUseCase().invoke(
-            connectionString = pr.resolveProperty("connectionString"),
-            containerName = pr.resolveProperty("containerName"),
-            keyStoreFileName = pr.resolveProperty("keyStoreFileName"),
-            supportDocumentFilename = pr.resolveProperty("supportDocumentFilename"),
-            project
-        )
+            RetrieveKeyStoreInformationUseCase().invoke(
+                connectionString = pr.resolveProperty("connectionString"),
+                containerName = pr.resolveProperty("containerName"),
+                keyStoreFileName = pr.resolveProperty("keyStoreFileName"),
+                supportDocumentFilename = pr.resolveProperty("supportDocumentFilename"),
+                project
+            )
 
-        project.afterEvaluate {
-            project.rootProject.projectDir.resolve(pr.resolveProperty("keyStoreFileName")).delete()
-            project.rootProject.projectDir.resolve(pr.resolveProperty("supportDocumentFilename")).delete()
-        }
-
-        // Register a task to download keystore files from Azure Blob Storage. The task's configuration
-        // is derived from the plugin extension.
-        val download = project.task("Test") {
-
-            it.doFirst {
-                RetrieveKeyStoreInformationUseCase().invoke(
-                    connectionString = pr.resolveProperty("connectionString"),
-                    containerName = pr.resolveProperty("containerName"),
-                    keyStoreFileName = pr.resolveProperty("keyStoreFileName"),
-                    supportDocumentFilename = pr.resolveProperty("supportDocumentFilename"),
-                    project
-                )
-            }
-        }
-
-        val remove = project.task("Remove") {
-            it.doLast {
+            project.afterEvaluate {
                 project.rootProject.projectDir.resolve(pr.resolveProperty("keyStoreFileName")).delete()
                 project.rootProject.projectDir.resolve(pr.resolveProperty("supportDocumentFilename")).delete()
             }
-        }
+
+            // Register a task to download keystore files from Azure Blob Storage. The task's configuration
+            // is derived from the plugin extension.
+            val download = project.task("Test") {
+
+                it.doFirst {
+                    RetrieveKeyStoreInformationUseCase().invoke(
+                        connectionString = pr.resolveProperty("connectionString"),
+                        containerName = pr.resolveProperty("containerName"),
+                        keyStoreFileName = pr.resolveProperty("keyStoreFileName"),
+                        supportDocumentFilename = pr.resolveProperty("supportDocumentFilename"),
+                        project
+                    )
+                }
+            }
+
+            val remove = project.task("Remove") {
+                it.doLast {
+                    project.rootProject.projectDir.resolve(pr.resolveProperty("keyStoreFileName")).delete()
+                    project.rootProject.projectDir.resolve(pr.resolveProperty("supportDocumentFilename")).delete()
+                }
+            }
 
 
-        project.tasks.whenTaskAdded { a ->
-            if (a.name == "validateSigningRelease") {
-                a.dependsOn(download)
+            project.tasks.whenTaskAdded { a ->
+                if (a.name == "validateSigningRelease") {
+                    a.dependsOn(download)
+                }
+                if (a.name == "packageRelease") {
+                    a.finalizedBy(remove)
+                }
             }
-            if (a.name == "packageRelease") {
-                a.finalizedBy(remove)
-            }
+        }catch (e: Exception){
+           project.logger.error("Error in AzureRemoteKeyStore plugin: ${e.message}")
+            project.logger.error(e.stackTraceToString())
         }
     }
 }

@@ -1,8 +1,5 @@
-import com.android.build.gradle.internal.tasks.ValidateSigningTask
-
 plugins {
     kotlin("multiplatform")
-//    alias(libs.plugins.androidApplication)
     id("com.android.application")
     id("io.github.kmbisset89.azurekeystore.plugin")
 }
