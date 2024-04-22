@@ -22,7 +22,7 @@ abstract class AzureRemoteKeyStore : Plugin<Project> {
      */
     override fun apply(project: Project) {
 
-        try{
+        try {
             val localProps = Properties().also {
                 if (project.rootProject.file("local.properties").exists()) {
                     it.load(project.rootProject.file("local.properties").inputStream())
@@ -67,19 +67,16 @@ abstract class AzureRemoteKeyStore : Plugin<Project> {
             }
 
 
-            project.afterEvaluate {
-                project.tasks.whenTaskAdded { a ->
-                    if (a.name == "validateSigningRelease") {
-                        a.dependsOn(download)
-                    }
-                    if (a.name == "packageRelease") {
-                        a.finalizedBy(remove)
-                    }
-                }
+            project.tasks.matching { it.name == "validateSigningRelease" }.configureEach {
+                it.dependsOn(download)
             }
 
-        }catch (e: Exception){
-           project.logger.error("Error in AzureRemoteKeyStore plugin: ${e.message}")
+            project.tasks.matching { it.name == "packageRelease" }.configureEach {
+                it.finalizedBy(remove)
+            }
+
+        } catch (e: Exception) {
+            project.logger.error("Error in AzureRemoteKeyStore plugin: ${e.message}")
             project.logger.error(e.stackTraceToString())
         }
     }
