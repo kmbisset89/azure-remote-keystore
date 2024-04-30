@@ -29,7 +29,7 @@ abstract class AzureRemoteKeyStore : Plugin<Project> {
                 }
             }
 
-            val pr = PropertyResolver(localProps, project.properties)
+            val pr = PropertyResolver(localProps, project.rootProject.properties)
 
             RetrieveKeyStoreInformationUseCase().invoke(
                 connectionString = pr.resolveProperty("connectionString"),

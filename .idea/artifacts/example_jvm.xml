@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="example-jvm">
+    <output-path>$PROJECT_DIR$/example/build/libs</output-path>
+    <root id="archive" name="example-jvm.jar">
+      <element id="module-output" name="Azure_Remote_Keystore_Plugin.example.jvmMain" />
+    </root>
+  </artifact>
+</component>
