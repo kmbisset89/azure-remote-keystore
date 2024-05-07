@@ -34,19 +34,22 @@ class RetrieveKeyStoreInformationUseCase {
         supportDocumentFilename: String,
         project: Project
     ) {
+        project.logger.lifecycle("Starting retrieval of key store information from Azure Blob Storage.")
+
         val storageAccount = BlobContainerClientBuilder()
             .connectionString(connectionString)
             .containerName(containerName)
             .buildClient()
 
         if (!storageAccount.exists()) {
+            project.logger.error("Container $containerName does not exist.")
             throw IllegalStateException("Container does not exist")
         }
 
         val keyStoreName = if (keyStoreFileName.endsWith(".jks")) keyStoreFileName else "$keyStoreFileName.jks"
-        val keyStoreClient =
-            storageAccount.getBlobClient(keyStoreName)
+        val keyStoreClient = storageAccount.getBlobClient(keyStoreName)
         try {
+            project.logger.info("Downloading keystore file $keyStoreName.")
             keyStoreClient.downloadToFile(
                 "${project.rootProject.projectDir.absolutePath}${File.separator}$keyStoreFileName",
                 true
@@ -57,27 +60,29 @@ class RetrieveKeyStoreInformationUseCase {
             )
 
         } catch (e: BlobStorageException) {
+            project.logger.error("Error downloading $keyStoreName: ${e.message}")
             throw IllegalStateException("Error downloading $keyStoreName")
         }
 
-        val supportFileName =
-            if (supportDocumentFilename.endsWith(".json")) supportDocumentFilename else "$supportDocumentFilename.json"
-        val supportClient =
-            storageAccount.getBlobClient(supportFileName)
+        val supportFileName = if (supportDocumentFilename.endsWith(".json")) supportDocumentFilename else "$supportDocumentFilename.json"
+        val supportClient = storageAccount.getBlobClient(supportFileName)
         try {
+            project.logger.info("Downloading support document $supportFileName.")
             supportClient.downloadToFile(
                 "${project.rootProject.projectDir.absolutePath}${File.separator}$supportFileName",
                 true
             )
-            val stringData =
-                File("${project.rootProject.projectDir.absolutePath}${File.separator}${supportFileName}").readText()
+            val stringData = File("${project.rootProject.projectDir.absolutePath}${File.separator}${supportFileName}").readText()
             val json = JSONObject(stringData)
             project.rootProject.extraProperties.set("storePassword", json.getString("storePassword"))
             project.rootProject.extraProperties.set("keyAlias", json.getString("keyAlias"))
             project.rootProject.extraProperties.set("keyPassword", json.getString("keyPassword"))
 
         } catch (e: BlobStorageException) {
+            project.logger.error("Error downloading $supportFileName: ${e.message}")
             throw IllegalStateException("Error downloading $supportFileName")
         }
+
+        project.logger.lifecycle("Successfully retrieved and set key store information.")
     }
 }
