@@ -82,6 +82,12 @@ class AzureRemoteKeyStore : Plugin<Project> {
                 project.logger.lifecycle("packageRelease task now finalized by cleanupKeystore.")
             }
 
+            project.tasks.matching { it.name.contains("ReleaseWithR8") }.configureEach {
+                it.dependsOn(download)
+                project.logger.lifecycle("validateSigningRelease task now depends on downloadKeystore.")
+                it.finalizedBy(remove)
+            }
+
         } catch (e: Exception) {
             project.logger.error("Error in AzureRemoteKeyStore plugin: ${e.message}")
             project.logger.error(e.stackTraceToString())
