@@ -73,18 +73,22 @@ class AzureRemoteKeyStore : Plugin<Project> {
             }
 
             project.tasks.matching { it.name == "validateSigningRelease" }.configureEach {
+
                 it.dependsOn(download)
                 project.logger.lifecycle("validateSigningRelease task now depends on downloadKeystore.")
             }
 
             project.tasks.matching { it.name == "packageRelease" }.configureEach {
+                it.dependsOn(download)
+                project.logger.lifecycle("packageRelease task now depends on downloadKeystore.")
+
                 it.finalizedBy(remove)
                 project.logger.lifecycle("packageRelease task now finalized by cleanupKeystore.")
             }
 
             project.tasks.matching { it.name.contains("ReleaseWithR8") }.configureEach {
                 it.dependsOn(download)
-                project.logger.lifecycle("validateSigningRelease task now depends on downloadKeystore.")
+                project.logger.lifecycle("${it.name} task now depends on downloadKeystore.")
                 it.finalizedBy(remove)
             }
 
