@@ -44,8 +44,12 @@ class AzureRemoteKeyStore : Plugin<Project> {
             )
 
             project.afterEvaluate {
-                project.rootProject.projectDir.resolve(pr.resolveProperty("keyStoreFileName")).delete()
-                project.rootProject.projectDir.resolve(pr.resolveProperty("supportDocumentFilename")).delete()
+                pr.resolveProperty("keyStoreFileName")?.let {
+                    project.rootProject.projectDir.resolve(it).delete()
+                }
+                pr.resolveProperty("supportDocumentFilename")?.let {
+                    project.rootProject.projectDir.resolve(it).delete()
+                }
                 project.logger.lifecycle("Temporary keystore and support document removed after evaluation.")
             }
 
@@ -66,8 +70,12 @@ class AzureRemoteKeyStore : Plugin<Project> {
 
             val remove = project.tasks.register("cleanupKeystore") {
                 it.doLast {
-                    project.rootProject.projectDir.resolve(pr.resolveProperty("keyStoreFileName")).delete()
-                    project.rootProject.projectDir.resolve(pr.resolveProperty("supportDocumentFilename")).delete()
+                    pr.resolveProperty("keyStoreFileName")?.let {
+                        project.rootProject.projectDir.resolve(it).delete()
+                    }
+                    pr.resolveProperty("supportDocumentFilename")?.let {
+                        project.rootProject.projectDir.resolve(it).delete()
+                    }
                     project.logger.info("Cleanup task executed: Keystore and support document deleted.")
                 }
             }

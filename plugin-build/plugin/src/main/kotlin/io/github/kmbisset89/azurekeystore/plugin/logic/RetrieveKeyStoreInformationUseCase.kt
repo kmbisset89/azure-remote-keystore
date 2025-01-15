@@ -28,10 +28,10 @@ class RetrieveKeyStoreInformationUseCase {
      * of the support document including storePassword, keyAlias, and keyPassword.
      */
     operator fun invoke(
-        connectionString: String,
-        containerName: String,
-        keyStoreFileName: String,
-        supportDocumentFilename: String,
+        connectionString: String?,
+        containerName: String?,
+        keyStoreFileName: String?,
+        supportDocumentFilename: String?,
         project: Project
     ) {
         project.logger.lifecycle("Starting retrieval of key store information from Azure Blob Storage.")
@@ -43,7 +43,7 @@ class RetrieveKeyStoreInformationUseCase {
             .containerName(containerName)
             .buildClient()
 
-        if (!storageAccount.exists()) {
+        if (!storageAccount.exists() || supportDocumentFilename.isNullOrBlank() || keyStoreFileName.isNullOrBlank()) {
             project.logger.error("Container $containerName does not exist.")
             usingDefaultKeystore = true
             useDefaultKeystore(project)
