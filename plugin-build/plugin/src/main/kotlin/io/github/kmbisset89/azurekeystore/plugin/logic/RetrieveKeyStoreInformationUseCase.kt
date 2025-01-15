@@ -41,20 +41,28 @@ class RetrieveKeyStoreInformationUseCase {
         project.logger.lifecycle("Starting retrieval of key store information from Azure Blob Storage.")
 
         var usingDefaultKeystore = false
+        val storageAccount = try {
+            BlobContainerClientBuilder()
+                .connectionString(connectionString)
+                .containerName(containerName)
+                .buildClient()
+        } catch (ex: Exception) {
+            usingDefaultKeystore = true
+            useDefaultKeystore(project)
+            null
+        }
 
-        val storageAccount = BlobContainerClientBuilder()
-            .connectionString(connectionString)
-            .containerName(containerName)
-            .buildClient()
 
-        if (!storageAccount.exists() || supportDocumentFilename.isNullOrBlank() || keyStoreFileName.isNullOrBlank()) {
+        if (storageAccount?.exists()
+                ?.not() == true || supportDocumentFilename.isNullOrBlank() || keyStoreFileName.isNullOrBlank() || usingDefaultKeystore
+        ) {
             project.logger.error("Container $containerName does not exist.")
             usingDefaultKeystore = true
             useDefaultKeystore(project)
         } else {
 
             val keyStoreName = if (keyStoreFileName.endsWith(".jks")) keyStoreFileName else "$keyStoreFileName.jks"
-            val keyStoreClient = storageAccount.getBlobClient(keyStoreName)
+            val keyStoreClient = storageAccount!!.getBlobClient(keyStoreName)
             try {
                 project.logger.info("Downloading keystore file $keyStoreName.")
                 keyStoreClient.downloadToFile(
@@ -104,21 +112,25 @@ class RetrieveKeyStoreInformationUseCase {
 
     private fun useDefaultKeystore(project: Project) {
         project.logger.warn("┌-------------------------------------------")
-        project.logger.warn("| We are going to use the DEFAULT KEY STORE")
+        project.logger.warn("| Using default keystore: Not recommended for production.")
         project.logger.warn("└--------------------------------------------")
 
-        // Create a temporary file (or any location you want to copy it to)
-        val tempKeystoreFile =
-            File("${project.rootProject.projectDir.absolutePath}${File.separator}DefaultKeystore", ".jks")
+        try {
+            // Create a temporary file (or any location you want to copy it to)
+            val tempKeystoreFile =
+                File("${project.rootProject.projectDir.absolutePath}${File.separator}", "DefaultKeystore.jks")
 
-       tempKeystoreFile.writeBytes(hexStringToByteArray(defaultKeystore.value))
+            tempKeystoreFile.writeBytes(hexStringToByteArray(defaultKeystore.value))
 
-        project.rootProject.extraProperties.set("keystoreFile", tempKeystoreFile)
-        project.rootProject.extraProperties.set("storePassword", "DefaultKeystore123!")
-        project.rootProject.extraProperties.set("keyAlias", "mamamia")
-        project.rootProject.extraProperties.set("keyPassword", "Herewegoagain")
+            project.rootProject.extraProperties.set("keystoreFile", tempKeystoreFile)
+            project.rootProject.extraProperties.set("storePassword", "DefaultKeystore123!")
+            project.rootProject.extraProperties.set("keyAlias", "mamamia")
+            project.rootProject.extraProperties.set("keyPassword", "Herewegoagain")
+        } catch (ex: Exception) {
+            project.logger.error("Critical Error: ${ex.message}")
+        }
+
     }
-
 
     private fun hexStringToByteArray(hexString: String): ByteArray {
         require(hexString.length % 2 == 0) { "Hex string must have an even length" }

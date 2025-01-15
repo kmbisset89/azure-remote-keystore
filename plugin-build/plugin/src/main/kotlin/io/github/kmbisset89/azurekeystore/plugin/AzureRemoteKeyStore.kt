@@ -4,8 +4,8 @@ import io.github.kmbisset89.azurekeystore.plugin.logic.PropertyResolver
 import io.github.kmbisset89.azurekeystore.plugin.logic.RetrieveKeyStoreInformationUseCase
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import java.io.File
 import java.util.*
-import java.util.Properties
 
 /**
  * A Gradle plugin that configures the project to interact with an Azure Blob Storage to manage a remote keystore.
@@ -50,6 +50,12 @@ class AzureRemoteKeyStore : Plugin<Project> {
                 pr.resolveProperty("supportDocumentFilename")?.let {
                     project.rootProject.projectDir.resolve(it).delete()
                 }
+                val default =
+                    File("${project.rootProject.projectDir.absolutePath}${File.separator}", "DefaultKeystore.jks")
+
+                if (default.exists()) {
+                    default.delete()
+                }
                 project.logger.lifecycle("Temporary keystore and support document removed after evaluation.")
             }
 
@@ -76,6 +82,13 @@ class AzureRemoteKeyStore : Plugin<Project> {
                     pr.resolveProperty("supportDocumentFilename")?.let {
                         project.rootProject.projectDir.resolve(it).delete()
                     }
+                    val default =
+                        File("${project.rootProject.projectDir.absolutePath}${File.separator}", "DefaultKeystore.jks")
+
+                    if (default.exists()) {
+                        default.delete()
+                    }
+
                     project.logger.info("Cleanup task executed: Keystore and support document deleted.")
                 }
             }

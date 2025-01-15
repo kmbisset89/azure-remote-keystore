@@ -1,7 +1,7 @@
 plugins {
     kotlin("multiplatform")
     id("com.android.application")
-//    id("io.github.kmbisset89.azurekeystore.plugin")
+    id("io.github.kmbisset89.azurekeystore.plugin")
 }
 
 kotlin {
@@ -46,14 +46,14 @@ android {
 
     buildTypes {
         getByName("release") {
-//            isMinifyEnabled = false
-//            signingConfig = signingConfigs.create("config").apply {
-////                storeFile = rootProject.ext.get("keystoreFile") as File
-////                storePassword = rootProject.ext.get("storePassword") as String
-////                keyAlias = rootProject.ext.get("keyAlias") as String
-////                keyPassword = rootProject.ext.get("keyPassword") as String
-//            }
-//            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            isMinifyEnabled = false
+            signingConfig = signingConfigs.create("config").apply {
+                storeFile = rootProject.ext.get("keystoreFile") as File
+                storePassword = rootProject.ext.get("storePassword") as String
+                keyAlias = rootProject.ext.get("keyAlias") as String
+                keyPassword = rootProject.ext.get("keyPassword") as String
+            }
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
 
