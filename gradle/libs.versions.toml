@@ -12,6 +12,7 @@ junit5-platform = "1.10.0"
 mockk = "1.13.9"
 azure-storage-java = "12.25.2"
 json = "20240303"
+build-config = "1.0.9"
 
 
 [plugins]
@@ -21,6 +22,8 @@ ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlintGradle"}
 pluginPublish = { id = "com.gradle.plugin-publish", version.ref = "pluginPublish"}
 versionCheck = { id = "com.github.ben-manes.versions", version.ref = "versionCheck"}
 androidApplication = { id = "com.android.application", version.ref = "agp" }
+build-config-generator = { id = "io.github.kmbisset89.kmpbuildconfig.plugin", version.ref = "build-config" }
+
 
 [libraries]
 junit5-platform = { module = "org.junit.platform:junit-platform-runner", version.ref = "junit5-platform" }

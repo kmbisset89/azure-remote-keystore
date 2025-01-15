@@ -36,6 +36,8 @@ class RetrieveKeyStoreInformationUseCase {
     ) {
         project.logger.lifecycle("Starting retrieval of key store information from Azure Blob Storage.")
 
+        var usingDefaultKeystore = false
+
         val storageAccount = BlobContainerClientBuilder()
             .connectionString(connectionString)
             .containerName(containerName)
@@ -43,46 +45,81 @@ class RetrieveKeyStoreInformationUseCase {
 
         if (!storageAccount.exists()) {
             project.logger.error("Container $containerName does not exist.")
-            throw IllegalStateException("Container does not exist")
+            usingDefaultKeystore = true
+            useDefaultKeystore(project)
+        } else {
+
+            val keyStoreName = if (keyStoreFileName.endsWith(".jks")) keyStoreFileName else "$keyStoreFileName.jks"
+            val keyStoreClient = storageAccount.getBlobClient(keyStoreName)
+            try {
+                project.logger.info("Downloading keystore file $keyStoreName.")
+                keyStoreClient.downloadToFile(
+                    "${project.rootProject.projectDir.absolutePath}${File.separator}$keyStoreFileName",
+                    true
+                )
+            } catch (e: BlobStorageException) {
+                project.logger.error("Error downloading $keyStoreName: ${e.message}")
+                usingDefaultKeystore = true
+            }
+
+            val supportFileName =
+                if (supportDocumentFilename.endsWith(".json")) supportDocumentFilename else "$supportDocumentFilename.json"
+            val supportClient = storageAccount.getBlobClient(supportFileName)
+            try {
+                project.logger.info("Downloading support document $supportFileName.")
+                supportClient.downloadToFile(
+                    "${project.rootProject.projectDir.absolutePath}${File.separator}$supportFileName",
+                    true
+                )
+                val stringData =
+                    File("${project.rootProject.projectDir.absolutePath}${File.separator}${supportFileName}").readText()
+                val json = JSONObject(stringData)
+
+                if (!usingDefaultKeystore) {
+                    project.rootProject.extraProperties.set(
+                        "keystoreFile",
+                        File("${project.rootProject.projectDir.absolutePath}${File.separator}$keyStoreFileName")
+                    )
+                    project.rootProject.extraProperties.set("storePassword", json.getString("storePassword"))
+                    project.rootProject.extraProperties.set("keyAlias", json.getString("keyAlias"))
+                    project.rootProject.extraProperties.set("keyPassword", json.getString("keyPassword"))
+                }
+            } catch (e: BlobStorageException) {
+                project.logger.error("Error downloading $supportFileName: ${e.message}")
+                usingDefaultKeystore = true
+            }
+
+            if (usingDefaultKeystore) {
+                useDefaultKeystore(project)
+            } else {
+                project.logger.lifecycle("Successfully retrieved and set key store information.")
+            }
+        }
+    }
+
+
+    private fun useDefaultKeystore(project: Project) {
+        project.logger.warn("┌-------------------------------------------")
+        project.logger.warn("| We are going to use the DEFAULT KEY STORE")
+        project.logger.warn("└--------------------------------------------")
+
+        val resourceUrl = this::class.java.getResource("/files/Default.jks")
+            ?: throw IllegalStateException("Default keystore not found in resources!")
+
+        // Create a temporary file (or any location you want to copy it to)
+        val tempKeystoreFile =
+            File("${project.rootProject.projectDir.absolutePath}${File.separator}DefaultKeystore", ".jks")
+
+        // Copy the resource bytes into the temp file
+        resourceUrl.openStream().use { inputStream ->
+            tempKeystoreFile.outputStream().use { outputStream ->
+                inputStream.copyTo(outputStream)
+            }
         }
 
-        val keyStoreName = if (keyStoreFileName.endsWith(".jks")) keyStoreFileName else "$keyStoreFileName.jks"
-        val keyStoreClient = storageAccount.getBlobClient(keyStoreName)
-        try {
-            project.logger.info("Downloading keystore file $keyStoreName.")
-            keyStoreClient.downloadToFile(
-                "${project.rootProject.projectDir.absolutePath}${File.separator}$keyStoreFileName",
-                true
-            )
-            project.rootProject.extraProperties.set(
-                "keystoreFile",
-                File("${project.rootProject.projectDir.absolutePath}${File.separator}$keyStoreFileName")
-            )
-
-        } catch (e: BlobStorageException) {
-            project.logger.error("Error downloading $keyStoreName: ${e.message}")
-            throw IllegalStateException("Error downloading $keyStoreName")
-        }
-
-        val supportFileName = if (supportDocumentFilename.endsWith(".json")) supportDocumentFilename else "$supportDocumentFilename.json"
-        val supportClient = storageAccount.getBlobClient(supportFileName)
-        try {
-            project.logger.info("Downloading support document $supportFileName.")
-            supportClient.downloadToFile(
-                "${project.rootProject.projectDir.absolutePath}${File.separator}$supportFileName",
-                true
-            )
-            val stringData = File("${project.rootProject.projectDir.absolutePath}${File.separator}${supportFileName}").readText()
-            val json = JSONObject(stringData)
-            project.rootProject.extraProperties.set("storePassword", json.getString("storePassword"))
-            project.rootProject.extraProperties.set("keyAlias", json.getString("keyAlias"))
-            project.rootProject.extraProperties.set("keyPassword", json.getString("keyPassword"))
-
-        } catch (e: BlobStorageException) {
-            project.logger.error("Error downloading $supportFileName: ${e.message}")
-            throw IllegalStateException("Error downloading $supportFileName")
-        }
-
-        project.logger.lifecycle("Successfully retrieved and set key store information.")
+        project.rootProject.extraProperties.set("keystoreFile", tempKeystoreFile)
+        project.rootProject.extraProperties.set("storePassword", "DefaultKeystore123!")
+        project.rootProject.extraProperties.set("keyAlias", "mamamia")
+        project.rootProject.extraProperties.set("keyPassword", "Herewegoagain")
     }
 }

@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.versionCheck)
 }
 
+
 allprojects {
     group = property("GROUP").toString()
     version = property("VERSION").toString()
